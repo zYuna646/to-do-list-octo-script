@@ -6,8 +6,12 @@ export class BaseSchema extends Schema {
       createdAt: { type: Date, default: Date.now },
       updatedAt: { type: Date, default: Date.now },
     };
-
-    super(baseSchemaDefinition);
+    const schemaOptions = {
+      timestamps: true, // Enables createdAt and updatedAt fields automatically
+      toObject: { virtuals: true },
+      toJSON: { virtuals: true },
+    };
+    super(baseSchemaDefinition, schemaOptions);
 
     this.methods.toJSON = function () {
       const obj = this.toObject();
