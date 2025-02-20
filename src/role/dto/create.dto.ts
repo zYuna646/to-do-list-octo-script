@@ -24,7 +24,6 @@ export class CreateDtoRole {
 
   @IsArray()
   @IsOptional()
-  @ArrayNotEmpty()
   @ApiProperty({
     description: 'List of permissions associated with the role',
     example: ['CREATE_USER', 'DELETE_USER'],

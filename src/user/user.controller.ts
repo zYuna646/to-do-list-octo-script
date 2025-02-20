@@ -23,6 +23,7 @@ import {
 import { Permission } from 'src/common/decorators/permissions.decorator';
 import { BaseResponse } from 'src/common/base/base.response';
 import { User } from 'src/common/schemas/user.schema';
+import { SocialMedia } from 'src/common/schemas/social-media.schema';
 
 @Controller('user')
 @ApiBearerAuth()
@@ -155,5 +156,31 @@ export class UserController {
   @Permission('DELETE')
   async softDelete(@Param('id') id: string): Promise<BaseResponse<User>> {
     return this.userService.delete(id);
+  }
+
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Get(':id/social-media')
+  @ApiOperation({ summary: 'Get a user by ID' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully retrieved the user.',
+    type: BaseResponse,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found.',
+    type: BaseResponse,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error.',
+    type: BaseResponse,
+  })
+  @Permission('GET')
+  async getSocialMedia(
+    @Param('id') id: string,
+  ): Promise<BaseResponse<SocialMedia[]>> {
+    return this.userService.getSocialMedia(id);
   }
 }

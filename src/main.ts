@@ -14,8 +14,8 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Your API Title')
-    .setDescription('Your API Description')
+    .setTitle('to-do list management posts on social media')
+    .setDescription('to-do list management posts on social media.')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
