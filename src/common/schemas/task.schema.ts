@@ -1,5 +1,6 @@
 import { BaseSchema } from 'src/common/base/base.schema';
 import mongoose, { Document } from 'mongoose';
+import { SocialMediaPost } from './social-media-post.schema';
 
 const TaskSchemaDefinition = {
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -17,12 +18,23 @@ const TaskSchemaDefinition = {
   },
 };
 
-const PopulateDefinition = {};
+const PopulateDefinition = [
+  { path: 'user' },
+  { path: 'socialMedia' },
+  { path: 'SocialMediaPosts' },
+];
 
 export const TaskSchema = new BaseSchema(
   TaskSchemaDefinition,
   PopulateDefinition,
 );
+
+TaskSchema.virtual('SocialMediaPosts', {
+  ref: 'SocialMediaPost',
+  localField: '_id',
+  foreignField: 'task',
+  justOne: false,
+});
 
 TaskSchema.pre('save', async function (next) {
   if (this.dueDate && new Date(this.dueDate as Date) < new Date()) {
@@ -42,9 +54,14 @@ export interface Task extends Document {
   createdAt: Date;
   updatedAt: Date;
   setCompleted(): Promise<Task>;
+  getPost(): Promise<SocialMediaPost[]>;
 }
 
 TaskSchema.methods.setCompleted = async function (): Promise<Task> {
   this.status = 'completed';
-  return this.save();
+  return await this.save();
+};
+
+TaskSchema.methods.getPost = async function (): Promise<SocialMediaPost[]> {
+  return this.SocialMediaPosts;
 };

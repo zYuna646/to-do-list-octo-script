@@ -7,7 +7,7 @@ import { Model } from 'mongoose';
 @Injectable()
 export class <%= classify(name) %>Service extends BaseService<<%= classify(model) %>> {
   constructor(
-    @InjectModel('<%= classify(model) %>') private<%= classify(model) %>Model: Model<<%= classify(model) %>>,
+    @InjectModel('<%= classify(model) %>') private <%= classify(model) %>Model: Model<<%= classify(model) %>>,
   ) {
     super(<%= classify(model) %>Model);
   }

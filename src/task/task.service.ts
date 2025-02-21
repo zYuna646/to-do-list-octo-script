@@ -5,6 +5,7 @@ import { Task } from 'src/common/schemas/task.schema';
 import { Model } from 'mongoose';
 import { BaseResponse } from 'src/common/base/base.response';
 import { HttpStatus } from '@nestjs/common';
+import { SocialMediaPost } from 'src/common/schemas/social-media-post.schema';
 
 @Injectable()
 export class TaskService extends BaseService<Task> {
@@ -29,6 +30,31 @@ export class TaskService extends BaseService<Task> {
       );
     } catch (error) {
       return new BaseResponse<Task>(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Error fetching entity',
+        null,
+        error.message,
+      );
+    }
+  }
+
+  async getPost(id: string): Promise<BaseResponse<SocialMediaPost[]>> {
+    try {
+      const entity = await this.TaskModel.findOne({ _id: id }).exec();
+      if (!entity) {
+        return new BaseResponse<SocialMediaPost[]>(
+          HttpStatus.NOT_FOUND,
+          'Entity not found',
+          null,
+        );
+      }
+      return new BaseResponse<SocialMediaPost[]>(
+        HttpStatus.OK,
+        'Entity fetched successfully',
+        await entity.getPost(),
+      );
+    } catch (error) {
+      return new BaseResponse<SocialMediaPost[]>(
         HttpStatus.INTERNAL_SERVER_ERROR,
         'Error fetching entity',
         null,

@@ -9,12 +9,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { BaseController } from 'src/common/base/base.controller'; // Assuming BaseController provides basic CRUD functionality
-import { Task } from 'src/common/schemas/task.schema';
-import { TaskService } from './task.service';
+import { SocialMediaPost } from 'src/common/schemas/social-media-post.schema';
+import { SocialMediaPostService } from './social-media-post.service';
 import { AuthGuard } from '@nestjs/passport';
 import { PermissionsGuard } from 'src/common/guards/permissions/permissions.guard';
-import { CreateDtoTask } from './dto/create.dto';
-import { UpdateDtoTask } from './dto/update.dto';
+import { CreateDtoSocialMediaPost } from './dto/create.dto';
+import { UpdateDtoSocialMediaPost } from './dto/update.dto';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -24,22 +24,24 @@ import {
 } from '@nestjs/swagger';
 import { Permission } from 'src/common/decorators/permissions.decorator';
 import { BaseResponse } from 'src/common/base/base.response';
-import { SocialMediaPost } from 'src/common/schemas/social-media-post.schema';
+import { Task } from 'src/common/schemas/task.schema';
 
-@Controller('task')
+@Controller('social-media-post')
 @ApiBearerAuth()
-export class TaskController extends BaseController<Task> {
-  constructor(protected readonly TaskService: TaskService) {
-    super(TaskService);
+export class SocialMediaPostController extends BaseController<SocialMediaPost> {
+  constructor(
+    protected readonly SocialMediaPostService: SocialMediaPostService,
+  ) {
+    super(SocialMediaPostService);
   }
 
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Post()
-  @ApiOperation({ summary: 'Create a new task' })
-  @ApiBody({ type: CreateDtoTask })
+  @ApiOperation({ summary: 'Create a new social-media-post' })
+  @ApiBody({ type: CreateDtoSocialMediaPost })
   @ApiResponse({
     status: 201,
-    description: 'The task has been successfully created.',
+    description: 'The social-media-post has been successfully created.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -53,21 +55,23 @@ export class TaskController extends BaseController<Task> {
     type: BaseResponse,
   })
   @Permission('POST')
-  async create(@Body() createDto: CreateDtoTask): Promise<BaseResponse<Task>> {
-    return this.TaskService.create(createDto);
+  async create(
+    @Body() createDto: CreateDtoSocialMediaPost,
+  ): Promise<BaseResponse<SocialMediaPost>> {
+    return this.SocialMediaPostService.create(createDto);
   }
 
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Get()
-  @ApiOperation({ summary: 'Get all tasks' })
+  @ApiOperation({ summary: 'Get all social-media-posts' })
   @ApiResponse({
     status: 200,
-    description: 'Successfully retrieved all tasks.',
+    description: 'Successfully retrieved all social-media-posts.',
     type: BaseResponse,
   })
   @ApiResponse({
     status: 404,
-    description: 'No tasks found.',
+    description: 'No social-media-posts found.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -76,22 +80,22 @@ export class TaskController extends BaseController<Task> {
     type: BaseResponse,
   })
   @Permission('GET')
-  async findAll(): Promise<BaseResponse<Task[]>> {
-    return this.TaskService.findAll();
+  async findAll(): Promise<BaseResponse<SocialMediaPost[]>> {
+    return this.SocialMediaPostService.findAll();
   }
 
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Get(':id')
-  @ApiOperation({ summary: 'Get a task by ID' })
+  @ApiOperation({ summary: 'Get a social-media-post by ID' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({
     status: 200,
-    description: 'Successfully retrieved the task.',
+    description: 'Successfully retrieved the social-media-post.',
     type: BaseResponse,
   })
   @ApiResponse({
     status: 404,
-    description: 'No task found with the given ID.',
+    description: 'No social-media-post found with the given ID.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -100,18 +104,20 @@ export class TaskController extends BaseController<Task> {
     type: BaseResponse,
   })
   @Permission('GET')
-  async findById(@Param('id') id: string): Promise<BaseResponse<Task>> {
-    return this.TaskService.findById(id);
+  async findById(
+    @Param('id') id: string,
+  ): Promise<BaseResponse<SocialMediaPost>> {
+    return this.SocialMediaPostService.findById(id);
   }
 
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Put(':id')
-  @ApiOperation({ summary: 'Update a task by ID' })
+  @ApiOperation({ summary: 'Update a social-media-post by ID' })
   @ApiParam({ name: 'id', type: String })
-  @ApiBody({ type: UpdateDtoTask })
+  @ApiBody({ type: UpdateDtoSocialMediaPost })
   @ApiResponse({
     status: 200,
-    description: 'The task has been successfully updated.',
+    description: 'The social-media-post has been successfully updated.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -121,7 +127,7 @@ export class TaskController extends BaseController<Task> {
   })
   @ApiResponse({
     status: 404,
-    description: 'No task found with the given ID.',
+    description: 'No social-media-post found with the given ID.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -132,23 +138,23 @@ export class TaskController extends BaseController<Task> {
   @Permission('PUT')
   async update(
     @Param('id') id: string,
-    @Body() updateDto: UpdateDtoTask,
-  ): Promise<BaseResponse<Task>> {
-    return this.TaskService.update(id, updateDto);
+    @Body() updateDto: UpdateDtoSocialMediaPost,
+  ): Promise<BaseResponse<SocialMediaPost>> {
+    return this.SocialMediaPostService.update(id, updateDto);
   }
 
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a task by ID' })
+  @ApiOperation({ summary: 'Delete a social-media-post by ID' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({
     status: 200,
-    description: 'The task has been successfully deleted.',
+    description: 'The social-media-post has been successfully deleted.',
     type: BaseResponse,
   })
   @ApiResponse({
     status: 404,
-    description: 'No task found with the given ID.',
+    description: 'No social-media-post found with the given ID.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -157,22 +163,24 @@ export class TaskController extends BaseController<Task> {
     type: BaseResponse,
   })
   @Permission('DELETE')
-  async softDelete(@Param('id') id: string): Promise<BaseResponse<Task>> {
-    return this.TaskService.delete(id);
+  async softDelete(
+    @Param('id') id: string,
+  ): Promise<BaseResponse<SocialMediaPost>> {
+    return this.SocialMediaPostService.delete(id);
   }
 
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-  @Get(':id/completed')
-  @ApiOperation({ summary: 'Set task to completed' })
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a social-media-post task by ID' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({
     status: 200,
-    description: 'Successfully set task to completed.',
+    description: 'Successfully retrieved the social-media-post task.',
     type: BaseResponse,
   })
   @ApiResponse({
     status: 404,
-    description: 'User not found.',
+    description: 'No social-media-post found with the given ID.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -182,16 +190,16 @@ export class TaskController extends BaseController<Task> {
   })
   @Permission('GET')
   async getTask(@Param('id') id: string): Promise<BaseResponse<Task>> {
-    return this.TaskService.setCompleted(id);
+    return this.SocialMediaPostService.getTask(id);
   }
 
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-  @Get(':id/post')
-  @ApiOperation({ summary: 'Get task post by id' })
+  @Get(':id/posted')
+  @ApiOperation({ summary: 'Get a social media task by ID' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({
     status: 200,
-    description: 'Successfully get post task .',
+    description: 'Successfully retrieved the user.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -205,9 +213,9 @@ export class TaskController extends BaseController<Task> {
     type: BaseResponse,
   })
   @Permission('GET')
-  async getPost(
+  async setPosted(
     @Param('id') id: string,
-  ): Promise<BaseResponse<SocialMediaPost[]>> {
-    return this.TaskService.getPost(id);
+  ): Promise<BaseResponse<SocialMediaPost>> {
+    return this.SocialMediaPostService.setPosted(id);
   }
 }
