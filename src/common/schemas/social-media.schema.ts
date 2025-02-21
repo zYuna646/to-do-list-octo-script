@@ -1,5 +1,6 @@
 import { BaseSchema } from 'src/common/base/base.schema';
 import mongoose, { Document } from 'mongoose';
+import { Task } from './task.schema';
 
 const SocialMediaSchemaDefinition = {
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -11,8 +12,6 @@ const SocialMediaSchemaDefinition = {
   accountId: { type: String, required: true },
   accessToken: { type: String, required: true },
   refreshToken: { type: String },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
 };
 
 const PopulateDefinition = { path: 'user' };
@@ -21,6 +20,13 @@ export const SocialMediaSchema = new BaseSchema(
   SocialMediaSchemaDefinition,
   PopulateDefinition,
 );
+
+SocialMediaSchema.virtual('Tasks', {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'socialMedia',
+  justOne: false,
+});
 
 SocialMediaSchema.pre('save', function (next) {
   this.updatedAt = new Date();
@@ -35,4 +41,8 @@ export interface SocialMedia extends Document {
   refreshToken?: string;
   createdAt: Date;
   updatedAt: Date;
+  getTask(): Promise<Task[]>;
 }
+SocialMediaSchema.methods.getTask = async function (): Promise<Task[]> {
+  return this.Tasks;
+};

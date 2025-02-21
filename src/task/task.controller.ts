@@ -8,36 +8,37 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateDtoUser } from './dto/create.dto';
-import { UpdateDtoUser } from './dto/update.dto';
+import { BaseController } from 'src/common/base/base.controller'; // Assuming BaseController provides basic CRUD functionality
+import { Task } from 'src/common/schemas/task.schema';
+import { TaskService } from './task.service';
 import { AuthGuard } from '@nestjs/passport';
 import { PermissionsGuard } from 'src/common/guards/permissions/permissions.guard';
+import { CreateDtoTask } from './dto/create.dto';
+import { UpdateDtoTask } from './dto/update.dto';
 import {
-  ApiOperation,
+  ApiBearerAuth,
   ApiBody,
+  ApiOperation,
   ApiParam,
   ApiResponse,
-  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { Permission } from 'src/common/decorators/permissions.decorator';
 import { BaseResponse } from 'src/common/base/base.response';
-import { User } from 'src/common/schemas/user.schema';
-import { SocialMedia } from 'src/common/schemas/social-media.schema';
-import { Task } from 'src/common/schemas/task.schema';
 
-@Controller('user')
+@Controller('task')
 @ApiBearerAuth()
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+export class TaskController extends BaseController<Task> {
+  constructor(protected readonly TaskService: TaskService) {
+    super(TaskService);
+  }
 
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Post()
-  @ApiOperation({ summary: 'Create a new user' })
-  @ApiBody({ type: CreateDtoUser })
+  @ApiOperation({ summary: 'Create a new task' })
+  @ApiBody({ type: CreateDtoTask })
   @ApiResponse({
     status: 201,
-    description: 'The user has been successfully created.',
+    description: 'The task has been successfully created.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -51,21 +52,21 @@ export class UserController {
     type: BaseResponse,
   })
   @Permission('POST')
-  async create(@Body() createDto: CreateDtoUser): Promise<BaseResponse<User>> {
-    return this.userService.create(createDto);
+  async create(@Body() createDto: CreateDtoTask): Promise<BaseResponse<Task>> {
+    return this.TaskService.create(createDto);
   }
 
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Get()
-  @ApiOperation({ summary: 'Get all users' })
+  @ApiOperation({ summary: 'Get all tasks' })
   @ApiResponse({
     status: 200,
-    description: 'Successfully retrieved all users.',
+    description: 'Successfully retrieved all tasks.',
     type: BaseResponse,
   })
   @ApiResponse({
     status: 404,
-    description: 'Users not found.',
+    description: 'No tasks found.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -74,22 +75,22 @@ export class UserController {
     type: BaseResponse,
   })
   @Permission('GET')
-  async findAll(): Promise<BaseResponse<User[]>> {
-    return this.userService.findAll();
+  async findAll(): Promise<BaseResponse<Task[]>> {
+    return this.TaskService.findAll();
   }
 
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Get(':id')
-  @ApiOperation({ summary: 'Get a user by ID' })
+  @ApiOperation({ summary: 'Get a task by ID' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({
     status: 200,
-    description: 'Successfully retrieved the user.',
+    description: 'Successfully retrieved the task.',
     type: BaseResponse,
   })
   @ApiResponse({
     status: 404,
-    description: 'User not found.',
+    description: 'No task found with the given ID.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -98,18 +99,18 @@ export class UserController {
     type: BaseResponse,
   })
   @Permission('GET')
-  async findById(@Param('id') id: string): Promise<BaseResponse<User>> {
-    return this.userService.findById(id);
+  async findById(@Param('id') id: string): Promise<BaseResponse<Task>> {
+    return this.TaskService.findById(id);
   }
 
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Put(':id')
-  @ApiOperation({ summary: 'Update a user by ID' })
+  @ApiOperation({ summary: 'Update a task by ID' })
   @ApiParam({ name: 'id', type: String })
-  @ApiBody({ type: UpdateDtoUser })
+  @ApiBody({ type: UpdateDtoTask })
   @ApiResponse({
     status: 200,
-    description: 'The user has been successfully updated.',
+    description: 'The task has been successfully updated.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -119,7 +120,7 @@ export class UserController {
   })
   @ApiResponse({
     status: 404,
-    description: 'User not found.',
+    description: 'No task found with the given ID.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -130,23 +131,23 @@ export class UserController {
   @Permission('PUT')
   async update(
     @Param('id') id: string,
-    @Body() updateDto: UpdateDtoUser,
-  ): Promise<BaseResponse<User>> {
-    return this.userService.update(id, updateDto);
+    @Body() updateDto: UpdateDtoTask,
+  ): Promise<BaseResponse<Task>> {
+    return this.TaskService.update(id, updateDto);
   }
 
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a user by ID' })
+  @ApiOperation({ summary: 'Delete a task by ID' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({
     status: 200,
-    description: 'The user has been successfully deleted.',
+    description: 'The task has been successfully deleted.',
     type: BaseResponse,
   })
   @ApiResponse({
     status: 404,
-    description: 'User not found.',
+    description: 'No task found with the given ID.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -155,17 +156,17 @@ export class UserController {
     type: BaseResponse,
   })
   @Permission('DELETE')
-  async softDelete(@Param('id') id: string): Promise<BaseResponse<User>> {
-    return this.userService.delete(id);
+  async softDelete(@Param('id') id: string): Promise<BaseResponse<Task>> {
+    return this.TaskService.delete(id);
   }
 
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-  @Get(':id/social-media')
-  @ApiOperation({ summary: 'Get a user social media by ID' })
+  @Get(':id/completed')
+  @ApiOperation({ summary: 'Set task to completed' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({
     status: 200,
-    description: 'Successfully retrieved the user.',
+    description: 'Successfully set task to completed.',
     type: BaseResponse,
   })
   @ApiResponse({
@@ -179,33 +180,7 @@ export class UserController {
     type: BaseResponse,
   })
   @Permission('GET')
-  async getSocialMedia(
-    @Param('id') id: string,
-  ): Promise<BaseResponse<SocialMedia[]>> {
-    return this.userService.getSocialMedia(id);
-  }
-
-  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-  @Get(':id/task')
-  @ApiOperation({ summary: 'Get a user task by ID' })
-  @ApiParam({ name: 'id', type: String })
-  @ApiResponse({
-    status: 200,
-    description: 'Successfully retrieved the user.',
-    type: BaseResponse,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'User not found.',
-    type: BaseResponse,
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal Server Error.',
-    type: BaseResponse,
-  })
-  @Permission('GET')
-  async getTask(@Param('id') id: string): Promise<BaseResponse<Task[]>> {
-    return this.userService.getTask(id);
+  async getTask(@Param('id') id: string): Promise<BaseResponse<Task>> {
+    return this.TaskService.setCompleted(id);
   }
 }

@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { SocialMediaModule } from './social-media/social-media.module';
 import { APP_GUARD } from '@nestjs/core';
 import { PermissionsGuard } from './common/guards/permissions/permissions.guard';
+import { TaskModule } from './task/task.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,6 +21,7 @@ import { PermissionsGuard } from './common/guards/permissions/permissions.guard'
     UserModule,
     AuthModule,
     SocialMediaModule,
+    TaskModule,
   ],
   controllers: [AppController],
   providers: [AppService],
