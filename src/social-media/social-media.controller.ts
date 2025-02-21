@@ -24,6 +24,7 @@ import {
 } from '@nestjs/swagger';
 import { Permission } from 'src/common/decorators/permissions.decorator';
 import { BaseResponse } from 'src/common/base/base.response';
+import { Task } from 'src/common/schemas/task.schema';
 
 @Controller('social-media')
 @ApiBearerAuth()
@@ -162,5 +163,29 @@ export class SocialMediaController extends BaseController<SocialMedia> {
     @Param('id') id: string,
   ): Promise<BaseResponse<SocialMedia>> {
     return this.SocialMediaService.delete(id);
+  }
+
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Get(':id/task')
+  @ApiOperation({ summary: 'Get a social media task by ID' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully retrieved the user.',
+    type: BaseResponse,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found.',
+    type: BaseResponse,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal Server Error.',
+    type: BaseResponse,
+  })
+  @Permission('GET')
+  async getTask(@Param('id') id: string): Promise<BaseResponse<Task[]>> {
+    return this.SocialMediaService.getTask(id);
   }
 }

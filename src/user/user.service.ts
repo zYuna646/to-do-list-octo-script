@@ -6,6 +6,7 @@ import { User } from 'src/common/schemas/user.schema';
 import { HttpStatus } from '@nestjs/common';
 import { BaseResponse } from 'src/common/base/base.response';
 import { SocialMedia } from 'src/common/schemas/social-media.schema';
+import { Task } from 'src/common/schemas/task.schema';
 
 @Injectable()
 export class UserService extends BaseService<User> {
@@ -34,6 +35,31 @@ export class UserService extends BaseService<User> {
       );
     } catch (error) {
       return new BaseResponse<SocialMedia[]>(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Error fetching entity',
+        null,
+        error.message,
+      );
+    }
+  }
+
+  async getTask(id: string): Promise<BaseResponse<Task[]>> {
+    try {
+      const entity = await this.userModel.findOne({ _id: id }).exec();
+      if (!entity) {
+        return new BaseResponse<Task[]>(
+          HttpStatus.NOT_FOUND,
+          'Entity not found',
+          null,
+        );
+      }
+      return new BaseResponse<Task[]>(
+        HttpStatus.OK,
+        'Entity fetched successfully',
+        await entity.getTask(),
+      );
+    } catch (error) {
+      return new BaseResponse<Task[]>(
         HttpStatus.INTERNAL_SERVER_ERROR,
         'Error fetching entity',
         null,

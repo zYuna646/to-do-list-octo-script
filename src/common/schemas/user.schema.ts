@@ -2,6 +2,7 @@ import { BaseSchema } from 'src/common/base/base.schema';
 import mongoose, { Document } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { SocialMedia } from './social-media.schema';
+import { Task } from './task.schema';
 
 const SALT_ROUNDS = 10;
 
@@ -36,6 +37,13 @@ UserSchema.virtual('SocialMedias', {
   justOne: false,
 });
 
+UserSchema.virtual('Tasks', {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'user',
+  justOne: false,
+});
+
 UserSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.__v;
@@ -52,6 +60,7 @@ export interface User extends Document {
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
   getSocialMedia(): Promise<SocialMedia[]>;
+  getTask(): Promise<Task[]>;
 }
 
 UserSchema.methods.comparePassword = async function (
@@ -62,4 +71,8 @@ UserSchema.methods.comparePassword = async function (
 
 UserSchema.methods.getSocialMedia = async function (): Promise<SocialMedia[]> {
   return this.SocialMedias;
+};
+
+UserSchema.methods.getTask = async function (): Promise<Task[]> {
+  return this.Tasks;
 };
